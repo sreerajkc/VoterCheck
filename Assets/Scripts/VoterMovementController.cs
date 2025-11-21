@@ -1,8 +1,6 @@
-using System.Diagnostics.Contracts;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class VoterController : MonoBehaviour
+public class VoterMovementController : MonoBehaviour
 {
     private CharacterController controller;
 
@@ -20,8 +18,6 @@ public class VoterController : MonoBehaviour
     private Camera mainCamera;
     private float turnSmoothVelocity;
 
-    private Vector3 velocity = Vector3.zero;
-
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -29,18 +25,15 @@ public class VoterController : MonoBehaviour
         Cursor.visible = false;
     }
 
-    void Update()
+    public void Move(Vector2 input)
     {
-
         groundedPlayer = controller.isGrounded;
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
         }
 
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0, vertical);
+        Vector3 direction = new Vector3(input.x, 0, input.y);
         Vector3 moveDirection = Vector3.zero;
 
         if (direction.magnitude >= 0.1f)
@@ -52,11 +45,6 @@ public class VoterController : MonoBehaviour
 
             moveDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
         }
-
-        /*if (direction != Vector3.zero)
-        {
-            transform.forward = moveDirection;
-        }*/
 
         // Jump
         if (Input.GetButton("Jump") && groundedPlayer)
@@ -70,6 +58,5 @@ public class VoterController : MonoBehaviour
         // Combine horizontal and vertical movement
         Vector3 finalMove = moveDirection * speed + (playerVelocity.y * Vector3.up);
         controller.Move(finalMove * Time.deltaTime);
-
     }
 }
