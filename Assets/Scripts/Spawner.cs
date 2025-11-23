@@ -9,7 +9,9 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private NetworkObject playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
     private VoterInputController voterInputController;
+    private VoterInteractionController voterInteractionController;
 
     public void OnConnectedToServer(NetworkRunner runner)
     {
@@ -43,9 +45,17 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if (voterInputController == null && NetworkPlayer.Local != null)
+        if (NetworkPlayer.Local != null)
         {
-            voterInputController = NetworkPlayer.Local.GetComponent<VoterInputController>();
+            if (voterInputController == null)
+            { 
+                voterInputController = NetworkPlayer.Local.GetComponent<VoterInputController>();
+            }
+
+            if (voterInteractionController == null)
+            {
+                voterInteractionController = NetworkPlayer.Local.GetComponent<VoterInteractionController>();
+            }
         }
 
         if (voterInputController != null)

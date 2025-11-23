@@ -22,30 +22,30 @@ public class ToiletUIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Toilet.OnVoterEntered += (VoterInteractionController v) => ToggleAppearanceCustomizer(true);
-        Toilet.OnVoterExit += (VoterInteractionController v) => ToggleAppearanceCustomizer(false);
+        Toilet.OnVoterEntered += ToggleAppearanceCustomizerForLocal;
+        Toilet.OnVoterExit += ToggleAppearanceCustomizerForLocal;
     }
     private void OnDisable()
     {
-        Toilet.OnVoterEntered -= (VoterInteractionController v) => ToggleAppearanceCustomizer(true);
-        Toilet.OnVoterExit -= (VoterInteractionController v) => ToggleAppearanceCustomizer(false);
+        Toilet.OnVoterEntered -= ToggleAppearanceCustomizerForLocal;
+        Toilet.OnVoterExit -= ToggleAppearanceCustomizerForLocal;
     }
 
     private void Start()
     {
         makingVoterIdInfo = new VoterIdInfo();
 
-        hairCustomizerUIController.Initialize("Hair", variantNames,(int id)=> makingVoterIdInfo.HairId = id);
+        hairCustomizerUIController.Initialize("Hair", variantNames, (int id) => makingVoterIdInfo.HairId = id);
         noseCustomizerUIController.Initialize("Nose", variantNames, (int id) => makingVoterIdInfo.NoseId = id);
         beardCustomizerUIController.Initialize("Beard", variantNames, (int id) => makingVoterIdInfo.BeardId = id);
-        moustacheCustomizerUIController.Initialize("Moustache", variantNames, (int id) => makingVoterIdInfo.MoustacheId= id);
+        moustacheCustomizerUIController.Initialize("Moustache", variantNames, (int id) => makingVoterIdInfo.MoustacheId = id);
         eyeColorCustomizerUIController.Initialize("Eye Color", variantNames, (int id) => makingVoterIdInfo.EyeColorInt = id);
         skinColorCustomizerUIController.Initialize("Skin Color", variantNames, (int id) => makingVoterIdInfo.SkinColorInt = id);
     }
 
-    private void ToggleAppearanceCustomizer(bool toggle)
+    private void ToggleAppearanceCustomizerForLocal()
     {
-        appearanceCustomizerPanel.SetActive(toggle);
+        appearanceCustomizerPanel.SetActive(!appearanceCustomizerPanel.activeInHierarchy);
     }
 
     [Button]

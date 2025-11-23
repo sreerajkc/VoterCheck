@@ -5,25 +5,26 @@ using UnityEngine;
 
 public class VoterInputController : NetworkBehaviour, IInputActivater
 {
-    [SerializeField] private NetworkPlayer networkPlayer; 
+    [SerializeField] private NetworkPlayer networkPlayer;
     [SerializeField] private Transform cameraLookAtPoint;
 
-    private VoterMovementController voterMovementController;
-
-    private Vector2 input;
-    private bool jumpButtonDown;
-    private float cameraEulerY;
-
+    [SerializeField] private VoterMovementController voterMovementController;
+    [SerializeField] private VoterInteractionController voterInteractionController;
     private Camera mainCamera;
 
-
     private NetworkInputData networkInputData = new NetworkInputData();
+    private NetworkInputData localInputData = new NetworkInputData();
 
-    public bool IsInputEnabled { get; set; } = true;
+    [Networked] public bool IsInputEnabled { get; set; } = true;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
 
     private void OnEnable()
     {
-        networkPlayer.onLocalPlayerSpawned += SetCamera;   
+        networkPlayer.onLocalPlayerSpawned += SetCamera;
     }
 
     private void OnDisable()
@@ -31,16 +32,36 @@ public class VoterInputController : NetworkBehaviour, IInputActivater
         networkPlayer.onLocalPlayerSpawned -= SetCamera;
     }
 
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
-
     // Start is called before the first frame update
     void Start()
     {
         Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;      
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+    public override void FixedUpdateNetwork()
+    {
+        if (!Object.HasInputAuthority && !Object.HasStateAuthority)
+            return;
+
+        if (GetInput(out NetworkInputData networkInput))
+        {
+            voterMovementController.Move(networkInput);
+
+            if (Object.HasStateAuthority)
+            {
+                if (networkInput.InteractButtonDown)
+                {
+                    voterInteractionController.EnterCurrentEnterable();
+                }
+
+                if (networkInput.CancelButtonDown)
+                {
+                    voterInteractionController.ExitCurrentExitable();
+                }
+            }
+        }
+
     }
 
     // Update is called once per frame
@@ -54,28 +75,39 @@ public class VoterInputController : NetworkBehaviour, IInputActivater
             float horizontal = Input.GetAxisRaw("Horizontal");
             float vertical = Input.GetAxisRaw("Vertical");
 
-            input = new Vector2(horizontal, vertical);
+            localInputData.Direction = new Vector2(horizontal, vertical);
 
             if (Input.GetButtonDown("Jump"))
-                jumpButtonDown = true;
-            cameraEulerY = mainCamera.transform.eulerAngles.y;
+            {
+                localInputData.JumpButtonDown = true;
+            }
+
+            if (Input.GetButtonDown("Interact"))
+            {
+                localInputData.InteractButtonDown = true;
+            }
+
+            localInputData.CameraEulerY = mainCamera.transform.eulerAngles.y;
         }
         else
         {
-            input = Vector2.zero;
-            cameraEulerY = 0;
+            if (Input.GetButtonDown("Cancel"))
+            {
+                localInputData.CancelButtonDown = true;
+            }
+
+            localInputData.Direction = Vector2.zero;
+            localInputData.CameraEulerY = 0;
         }
-
-
     }
 
     public NetworkInputData GetNetworkedInputData()
     {
-        networkInputData.Direction = input;
-        networkInputData.JumpButtonDown = jumpButtonDown;
-        networkInputData.CameraEulerY = cameraEulerY;
+        networkInputData = localInputData;
 
-        jumpButtonDown = false;
+        localInputData.JumpButtonDown = false;
+        localInputData.InteractButtonDown = false;
+        localInputData.CancelButtonDown = false;
 
         return networkInputData;
     }

@@ -14,18 +14,6 @@ public class VoterMovementController : NetworkBehaviour
         networkPlayer = GetComponent<NetworkPlayer>();
     }
 
-    public override void FixedUpdateNetwork()
-    {
-        if (!Object.HasInputAuthority && !Object.HasStateAuthority)
-            return;
-
-        if (GetInput(out NetworkInputData networkInput))
-        {
-            Move(networkInput);
-        }
-
-    }
-
     public void Move(NetworkInputData networkInputData)
     {
         Vector3 direction = new Vector3(networkInputData.Direction.x, 0, networkInputData.Direction.y);

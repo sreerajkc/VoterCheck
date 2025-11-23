@@ -1,14 +1,11 @@
 using Cinemachine;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
-    public static CameraManager Instance { get; private set; }  
+    public static CameraManager Instance { get; private set; }
 
     [SerializeField] private CinemachineBrain cinemachineBrain;
     [SerializeField] private CinemachineFreeLook thirdPersonCamera;
@@ -46,14 +43,14 @@ public class CameraManager : MonoBehaviour
         thirdPersonCamera.LookAt = player;
     }
 
-    private void EnableThirdPersonCamera(VoterInteractionController controller)
+    public void EnableThirdPersonCamera()
     {
         thirdPersonCamera.enabled = true;
         WaitThirdPersonCameraToBlend();
     }
 
 
-    private void DisableThirdPersonCamera(VoterInteractionController controller)
+    public void DisableThirdPersonCamera()
     {
         SetThirdPersonCameraSpeed(0, 0);
         thirdPersonCamera.enabled = false;

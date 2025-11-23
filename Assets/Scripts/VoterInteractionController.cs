@@ -1,10 +1,11 @@
 using DG.Tweening;
+using Fusion;
+using System;
 using UnityEngine;
 
-public class VoterInteractionController : MonoBehaviour
+public class VoterInteractionController : NetworkBehaviour
 {
-    private IEnterable currentEnterable;
-    private IExitable currentExitable;
+    private IEnterable currentEnterable { get; set; }
 
     private IInputActivater inputActivater;
 
@@ -13,32 +14,16 @@ public class VoterInteractionController : MonoBehaviour
         inputActivater = GetComponent<IInputActivater>();
     }
 
-    private void Update()
-    {
-        if (currentEnterable != null && Input.GetButtonDown("Interact"))
-        {
-            currentEnterable.Enter(this);
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
+        if (!Object.HasStateAuthority)
+        {
+            return;
+        }
+
         if (other.TryGetComponent<IEnterable>(out IEnterable enterable))
         {
-            currentEnterable =  enterable;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (currentEnterable != null && other.TryGetComponent<IEnterable>(out IEnterable enterable))
-        {
             currentEnterable = enterable;
-
-            if (enterable is IExitable)
-            {
-                currentExitable = enterable as IExitable;
-            }
         }
     }
 
@@ -51,5 +36,22 @@ public class VoterInteractionController : MonoBehaviour
     public void OnExitToilet()
     {
         DOVirtual.DelayedCall(1, inputActivater.EnableInput);
+    }
+
+    public void EnterCurrentEnterable()
+    {
+        if (currentEnterable != null)
+        {
+            currentEnterable.Enter(this);
+        }
+    }
+    
+    public void ExitCurrentExitable()
+    {
+        if (currentEnterable is IExitable currentExitable)
+        {
+            currentExitable.Exit();
+            currentEnterable =null;
+        }
     }
 }
