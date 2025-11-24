@@ -33,8 +33,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5432592387362639493}
-  - {fileID: 3164239480089023617}
   - {fileID: 8407118279417412011}
+  - {fileID: 3164239480089023617}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8144026816996533753
@@ -70,6 +70,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isOccupiedText: {fileID: 8779729938999681068}
   _IsOccupied: 0
+  _voterInteractionController: {fileID: 0}
+  _previousVoterInteractionController: {fileID: 0}
 --- !u!65 &4307212468736353124
 BoxCollider:
   m_ObjectHideFlags: 0

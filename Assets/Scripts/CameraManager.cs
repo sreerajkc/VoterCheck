@@ -68,4 +68,15 @@ public class CameraManager : MonoBehaviour
         thirdPersonCamera.m_XAxis.m_MaxSpeed = XAxisMaxSpeed;
         thirdPersonCamera.m_YAxis.m_MaxSpeed = YAxisMaxSpeed;
     }
+
+    public void ChangeCameraPosition(Transform cameraPoint)
+    {
+        thirdPersonCamera.transform.SetPositionAndRotation(cameraPoint.position, cameraPoint.rotation);
+    }
+
+    public void ChangeCameraTarget(Transform cameraPointLookAt)
+    {
+        thirdPersonCamera.Follow = cameraPointLookAt;
+        thirdPersonCamera.LookAt = cameraPointLookAt;
+    }
 }

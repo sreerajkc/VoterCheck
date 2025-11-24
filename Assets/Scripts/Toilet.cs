@@ -11,17 +11,11 @@ public class Toilet : NetworkBehaviour, IExitable, IEnterable
     public static event Action OnVoterEntered;
     public static event Action OnVoterExit;
 
-    [Networked]
+    [Networked, OnChangedRender(nameof(OnIsOccupiedChange))]
     public bool IsOccupied { get; set; }
 
-    [Networked, OnChangedRender(nameof(OnVoterInteractionControllerChanged))]
-    public VoterInteractionController voterInteractionController { get; set; }
-
     [Networked]
-    public VoterInteractionController previousVoterInteractionController { get; set; }
-
-
-
+    public VoterInteractionController voterInteractionController { get; set; }
     public bool CanEnter { get; }
 
     public override void Render()
@@ -31,38 +25,42 @@ public class Toilet : NetworkBehaviour, IExitable, IEnterable
 
     public void Enter(VoterInteractionController voterInteractionController)
     {
-        IsOccupied = true;
-        this.voterInteractionController = voterInteractionController;
-        previousVoterInteractionController = voterInteractionController;
+        if (!IsOccupied)
+        {
+            this.voterInteractionController = voterInteractionController;
 
-        voterInteractionController.transform.position = new Vector3(transform.position.x,
-                    voterInteractionController.transform.position.y, transform.position.z);
-        voterInteractionController.OnEnterToilet();
+            voterInteractionController.transform.position = new Vector3(transform.position.x,
+                        voterInteractionController.transform.position.y, transform.position.z + 10);
+            voterInteractionController.DisableInput();
+
+            IsOccupied = true;
+        }
     }
 
     public void Exit()
     {
-        IsOccupied = false;
-
-        voterInteractionController.OnExitToilet();
-        voterInteractionController = null;
+        if (IsOccupied)
+        {
+            IsOccupied = false;
+            voterInteractionController.EnableInput();
+        }
     }
 
-    private void OnVoterInteractionControllerChanged()
+    private void OnIsOccupiedChange()
     {
-        if (voterInteractionController != null)
+        if (IsOccupied)
         {
-            if (voterInteractionController.HasInputAuthority)
+            if (voterInteractionController != null && voterInteractionController.HasInputAuthority)
             {
                 OnVoterEntered?.Invoke();
             }
         }
-        else if (previousVoterInteractionController != null)
+        else
         {
-            if (previousVoterInteractionController.HasInputAuthority)
+            if (voterInteractionController != null && voterInteractionController.HasInputAuthority)
             {
                 OnVoterExit?.Invoke();
-                previousVoterInteractionController = null;
+                voterInteractionController = null;
             }
         }
     }

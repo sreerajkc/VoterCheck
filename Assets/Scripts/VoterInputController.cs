@@ -39,6 +39,10 @@ public class VoterInputController : NetworkBehaviour, IInputActivater
         Cursor.lockState = CursorLockMode.None;
     }
 
+    public override void Spawned()
+    {
+        base.Spawned();
+    }
     public override void FixedUpdateNetwork()
     {
         if (!Object.HasInputAuthority && !Object.HasStateAuthority)

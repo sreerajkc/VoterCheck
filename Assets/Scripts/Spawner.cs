@@ -4,14 +4,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System.Xml.Schema;
 
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    [SerializeField] private NetworkObject playerPrefab;
+    [SerializeField] private NetworkObject voterPrefab;
+    [SerializeField] private NetworkObject officerPrefab;
+    
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
     private VoterInputController voterInputController;
     private VoterInteractionController voterInteractionController;
+
+    private int officerSpawnIndex = -1;
+    private int currentSpawnIndex;
 
     public void OnConnectedToServer(NetworkRunner runner)
     {
@@ -22,12 +29,27 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log("Player Joined");
 
+        int totalPlayerCount = runner.CommittedPlayers.Count();
+
         if (runner.IsServer)
         {
-            // Create a unique position for the player
-            Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-40f, 40f), 0, UnityEngine.Random.Range(-40f, 40f));
-            NetworkObject networkPlayerObject = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
-            // Keep track of the player avatars for easy access
+            if (officerSpawnIndex < 0)
+            {
+                officerSpawnIndex = UnityEngine.Random.Range(0, totalPlayerCount);
+            }
+
+            NetworkObject networkPlayerObject;
+            if (currentSpawnIndex == officerSpawnIndex)
+            {
+                Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-40f, 40f), 0, UnityEngine.Random.Range(-40f, 40f));
+                networkPlayerObject = runner.Spawn(officerPrefab, spawnPosition, Quaternion.identity, player);
+            }
+            else
+            {
+                Vector3 spawnPosition = new Vector3(10 , 0, 15);
+                networkPlayerObject = runner.Spawn(voterPrefab, spawnPosition, Quaternion.identity, player);
+            }
+
             _spawnedCharacters.Add(player, networkPlayerObject);
         }
     }
@@ -48,7 +70,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         if (NetworkPlayer.Local != null)
         {
             if (voterInputController == null)
-            { 
+            {
                 voterInputController = NetworkPlayer.Local.GetComponent<VoterInputController>();
             }
 

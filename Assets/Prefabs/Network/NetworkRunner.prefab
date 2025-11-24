@@ -57,4 +57,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 228656177a9c291498dbe9cae4f631b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 2407083441560133043, guid: a052e530228871b4bb7c519a3014bff3, type: 3}
+  voterPrefab: {fileID: 2407083441560133043, guid: a052e530228871b4bb7c519a3014bff3, type: 3}
+  officerPrefab: {fileID: 1014664155070959260, guid: ebf20826adc4e4c46810713ac252d428, type: 3}

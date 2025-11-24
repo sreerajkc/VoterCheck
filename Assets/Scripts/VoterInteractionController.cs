@@ -27,13 +27,13 @@ public class VoterInteractionController : NetworkBehaviour
         }
     }
 
-    public void OnEnterToilet()
+    public void DisableInput()
     {
         inputActivater.DisableInput();
         transform.forward = Vector3.forward;
     }
 
-    public void OnExitToilet()
+    public void EnableInput()
     {
         DOVirtual.DelayedCall(1, inputActivater.EnableInput);
     }
