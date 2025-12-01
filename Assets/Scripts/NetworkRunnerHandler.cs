@@ -1,6 +1,4 @@
 using Fusion;
-using Fusion.Sockets;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,42 +8,48 @@ public class NetworkRunnerHandler : MonoBehaviour
 {
     [SerializeField] private NetworkRunner networkRunnerPrefab;
 
-    private NetworkRunner networkRunner;
+    public NetworkRunner Runner { get; private set; }
 
-    // Start is called before the first frame update
-    async void Start()
+    private void Awake()
     {
-        networkRunner = Instantiate(networkRunnerPrefab);
-        networkRunner.name = "NetworkRunner";
-        var clientTask =  InitializeNetworkRunner(networkRunner, GameMode.AutoHostOrClient, NetAddress.Any(), SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex), null);
-        await clientTask;
-        Debug.Log("Networkrunner Started");
+        DontDestroyOnLoad(gameObject);
     }
-    
-    protected virtual Task InitializeNetworkRunner
-        (NetworkRunner runner,GameMode gameMode,NetAddress netAddress,SceneRef scene,Action<NetworkRunner> initialized)
-    {
 
-        var sceneManager = runner.GetComponents(typeof(MonoBehaviour)).OfType<INetworkSceneManager>().FirstOrDefault();
+    public async Task CreateRoom()
+    {
+        await StartRunner(GameMode.Host, RoomCodeGenerator.Generate(5));
+    }
+
+    public async Task JoinRoom(string roomCode)
+    {
+        roomCode = roomCode.ToUpper();
+        await StartRunner(GameMode.Client, roomCode);
+    }
+
+    private async Task StartRunner(GameMode gameMode, string roomCode)
+    {
+        Runner = Instantiate(networkRunnerPrefab);
+        Runner.name = "NetworkRunner";
+
+        var sceneManager = Runner.GetComponents(typeof(MonoBehaviour)).OfType<INetworkSceneManager>().FirstOrDefault();
 
         if (sceneManager == null)
         {
-            sceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
+            sceneManager = Runner.gameObject.AddComponent<NetworkSceneManagerDefault>();
         }
 
-        runner.ProvideInput = true;
+        Runner.ProvideInput = true;
+        var sceneRef = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
 
-        return runner.StartGame(new StartGameArgs
-        { 
+        var result = await Runner.StartGame(new StartGameArgs
+        {
             GameMode = gameMode,
-            Address = netAddress,
-            Scene = scene,
-            SessionName = "TestRoom",
-            OnGameStarted = initialized,
+            Scene = sceneRef,
+            SessionName = roomCode,
             SceneManager = sceneManager
         }
         );
 
-
+        Debug.Log(roomCode);
     }
 }

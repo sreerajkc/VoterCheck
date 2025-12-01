@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7399159463837022444}
   - component: {fileID: 5396248033346146625}
-  - component: {fileID: 6555046570017963057}
+  - component: {fileID: 14210169951230240}
   m_Layer: 0
   m_Name: NetworkRunner
   m_TagString: Untagged
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: -1199893898, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6555046570017963057
+--- !u!114 &14210169951230240
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,8 +54,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2986654698142144468}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 228656177a9c291498dbe9cae4f631b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 635257030dd4d6c4cbffdf65a5e44b33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  voterPrefab: {fileID: 2407083441560133043, guid: a052e530228871b4bb7c519a3014bff3, type: 3}
-  officerPrefab: {fileID: 1014664155070959260, guid: ebf20826adc4e4c46810713ac252d428, type: 3}
